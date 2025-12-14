@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浪漫粒子圣诞树</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">Merry Christmas</div>
+    <script>
+        // 初始化场景、相机、渲染器
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 粒子数量
+        const particleCount = 8000;
+        // 粒子几何体
+        const geometry = new THREE.BufferGeometry();
+        // 粒子材质
+        const material = new THREE.PointsMaterial({
+            size: 2,
+            color: 0xff69b4,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        // 粒子位置和颜色数组
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        // 生成圣诞树形状的粒子
+        for (let i = 0; i < particleCount; i++) {
+            const t = i / particleCount * Math.PI * 2;
+            const r = Math.sqrt(i / particleCount) * 5;
+            const z = i / particleCount * 10 - 5;
+
+            positions[i * 3] = r * Math.sin(t);
+            positions[i * 3 + 1] = z;
+            positions[i * 3 + 2] = r * Math.cos(t);
+
+            // 颜色渐变
+            const colorFactor = (z + 5) / 10;
+            colors[i * 3] = 1;
+            colors[i * 3 + 1] = colorFactor * 0.8;
+            colors[i * 3 + 2] = colorFactor * 0.9;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        material.vertexColors = true;
+
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+
+        camera.position.z = 10;
+
+        // 动画函数
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.rotation.y += 0.002;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // 窗口大小调整
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
